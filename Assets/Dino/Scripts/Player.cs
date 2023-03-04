@@ -5,77 +5,65 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-     public float speed = 5.0f; // adjust this value to change the player's movement speed
-    public float jumpForce = 10.0f; // adjust this value to change the player's jump force
-    public float mouseSensitivity = 100.0f; // adjust this value to change the mouse sensitivity
-    public float minY = -60.0f; // the minimum y value of the camera
-    public float maxY = 60.0f; // the maximum y value of the camera
-    public float maxStepHeight = 0.5f; // adjust this value to change the maximum step height the player can climb
-    public float slopeLimit = 45f; // adjust this value to change the maximum slope angle the player can climb
-    public Transform groundCheck; // a reference to the object that checks if the player is on the ground
-    public float groundDistance = 0.4f; // the distance to check if the player is on the ground
-    
-    private float rotationY = 0.0f;
+   
+    public float moveSpeed = 5f;
+    public float jumpForce = 10f;
+    public float gravity = -20f;
+    public float lookSensitivity = 3f;
+    public float maxLookUpAngle = 60f;
+    public float maxLookDownAngle = -60f;
+
     private CharacterController controller;
+    private Camera playerCamera;
+    private Vector3 moveDirection;
+    private float lookAngleX;
+    private float lookAngleY;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
-
-        Cursor.visible = false;
+        playerCamera = GetComponentInChildren<Camera>();
         Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
     {
-        // Check if the player is on the ground
-        bool isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, LayerMask.GetMask("Ground"));
+        // Handle player movement
+        float moveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
+        Vector3 moveDirection = new Vector3(moveX, 0f, moveZ);
+        moveDirection = playerCamera.transform.TransformDirection(moveDirection);
+        moveDirection.y = 0f;
+        moveDirection.Normalize();
+        moveDirection *= moveSpeed;
 
-        // Move the player in the direction of the arrow keys
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-        Vector3 moveDirection = transform.right * horizontalInput + transform.forward * verticalInput;
-        controller.Move(moveDirection * speed * Time.deltaTime);
-
-        // Check if the player can step up
-        float stepHeight = Mathf.Infinity;
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit))
+        if (controller.isGrounded)
         {
-            stepHeight = transform.position.y - hit.point.y;
-        }
-
-        // Check if the player can climb the slope
-        float slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
-        bool isOnSteepSlope = slopeAngle > slopeLimit;
-
-        // Jump if the player is on the ground and the jump key is pressed, or if they are on a slope they can climb
-        if ((isGrounded || stepHeight <= maxStepHeight || isOnSteepSlope) && Input.GetKeyDown(KeyCode.Space))
-        {
-            controller.Move(Vector3.up * jumpForce * Time.deltaTime);
-        }
-
-        // Rotate the camera based on the mouse movement
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-        rotationY -= mouseY;
-        rotationY = Mathf.Clamp(rotationY, minY, maxY);
-        Camera.main.transform.localRotation = Quaternion.Euler(rotationY, 0, 0);
-        transform.Rotate(Vector3.up * mouseX);
-    }
-
-    void FixedUpdate()
-    {
-        // Check if the player is on a slope
-        RaycastHit slopeHit;
-        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, groundDistance))
-        {
-            float slopeAngle = Vector3.Angle(slopeHit.normal, Vector3.up);
-            if (slopeAngle > slopeLimit && slopeHit.distance <= maxStepHeight)
+            moveDirection.y = 0f;
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                Vector3 slopeDirection = Vector3.Cross(slopeHit.normal, Vector3.down);
-                controller.Move(slopeDirection * speed * Time.deltaTime);
+                moveDirection.y = jumpForce;
             }
+        }
+
+        moveDirection.y += gravity * Time.deltaTime;
+        controller.Move(moveDirection * Time.deltaTime);
+
+        // Handle camera movement
+        float lookX = Input.GetAxis("Mouse X") * lookSensitivity;
+        float lookY = Input.GetAxis("Mouse Y") * lookSensitivity;
+        lookAngleX += lookX;
+        lookAngleY -= lookY;
+        lookAngleY = Mathf.Clamp(lookAngleY, maxLookDownAngle, maxLookUpAngle);
+        transform.rotation = Quaternion.Euler(0f, lookAngleX, 0f);
+        playerCamera.transform.localRotation = Quaternion.Euler(lookAngleY, 0f, 0f);
+
+        // Rotate the player to match the direction of the camera
+        Vector3 playerForward = playerCamera.transform.forward;
+        playerForward.y = 0f;
+        if (playerForward != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(playerForward);
         }
     }
 }
