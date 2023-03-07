@@ -11,6 +11,9 @@ namespace StarterAssets
 #endif
 	public class FirstPersonController : MonoBehaviour
 	{
+		public static FirstPersonController Instance;
+		public bool isAlive = true;
+		
 		[Header("Player")]
 		[Tooltip("Move speed of the character in m/s")]
 		public float MoveSpeed = 4.0f;
@@ -93,6 +96,7 @@ namespace StarterAssets
 			{
 				_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			}
+			Instance = this;
 		}
 
 		private void Start()
@@ -112,6 +116,8 @@ namespace StarterAssets
 
 		private void Update()
 		{
+			if(!isAlive) return;
+			
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
@@ -119,6 +125,8 @@ namespace StarterAssets
 
 		private void LateUpdate()
 		{
+			if(!isAlive) return;
+
 			CameraRotation();
 		}
 
