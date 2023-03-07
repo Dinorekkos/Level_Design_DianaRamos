@@ -6,6 +6,7 @@ using UnityEngine;
 public class Damage : MonoBehaviour
 {
     public float height;
+    public bool canMove;
     void Start()
     {
         
@@ -14,8 +15,10 @@ public class Damage : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // move the objetc up and down over time
-        transform.position = new Vector3(transform.position.x, Mathf.PingPong(Time.time, height), transform.position.z);
+        if (canMove)
+        {
+            transform.position = new Vector3(transform.position.x, Mathf.PingPong(Time.time, height), transform.position.z);
+        }
     }
     
     private void OnTriggerEnter(Collider other)

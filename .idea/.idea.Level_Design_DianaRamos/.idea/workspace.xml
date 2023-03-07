@@ -10,6 +10,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Dino/Scripts/Damage.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/StarterAssets/FirstPersonController/Scripts/BasicRigidBodyPush.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.probuilder@5.0.6/Editor/EditorCore/ProBuilderMeshPreview.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -80,7 +81,7 @@
       <option name="presentableId" value="Default" />
       <updated>1677888243941</updated>
       <workItem from="1677888250831" duration="3535000" />
-      <workItem from="1678163586044" duration="7592000" />
+      <workItem from="1678163586044" duration="8543000" />
     </task>
     <servers />
   </component>

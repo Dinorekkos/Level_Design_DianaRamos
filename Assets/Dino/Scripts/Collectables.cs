@@ -9,10 +9,19 @@ public class Collectables : MonoBehaviour
 
     private Vector3 _center;
     MeshRenderer _meshRenderer;
+    private bool isMoving = false;
+    private float _distance = 0.5f;
+    
 
     void Update()
     {
         transform.Rotate(rotation *  Time.deltaTime);
+
+        if (isMoving)
+        {
+            transform.position = new Vector3(Mathf.PingPong(Time.time, _distance), transform.position.y, transform.position.z);
+
+        }
     }
 
     private void OnTriggerEnter(Collider other)
